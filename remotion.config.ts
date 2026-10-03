@@ -12,3 +12,5 @@ Config.setRspack(true);
 Config.setVideoImageFormat("jpeg");
 Config.setOverwriteOutput(true);
 Config.overrideBundlerConfig(enableTailwind);
+
+Config.setOffthreadVideoCacheSizeInBytes(128 * 1024 * 1024);

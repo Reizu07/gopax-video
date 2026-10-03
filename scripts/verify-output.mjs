@@ -1,0 +1,10 @@
+import {execFileSync} from 'node:child_process';
+import fs from 'node:fs';
+const path='out/gopax-hackathon-demo.mp4';
+const probe=JSON.parse(execFileSync('node_modules/@remotion/compositor-linux-x64-gnu/ffprobe',['-v','error','-show_format','-show_streams','-of','json',path],{encoding:'utf8'}));
+const video=probe.streams.find(s=>s.codec_type==='video');
+const checks={width:video.width===1920,height:video.height===1080,fps:video.avg_frame_rate==='30/1',codec:video.codec_name==='h264',duration:Math.abs(Number(probe.format.duration)-176.2)<0.04,noAudio:probe.streams.every(s=>s.codec_type!=='audio'),frames:Number(video.nb_frames)===5286};
+fs.writeFileSync('out/export-verification.json',JSON.stringify({checks,probe},null,2));
+console.log(checks);
+if(Object.values(checks).some(v=>!v))process.exit(1);
+fs.appendFileSync('out/QUALITY-CHECK.md','\n## MP4 final\n\n- PASS: ffprobe memverifikasi H.264, 1920×1080, 30 fps, 5286 frame, 176,2 detik, tanpa track audio. Bukti: `export-verification.json`.\n');
